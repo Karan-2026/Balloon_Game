@@ -135,19 +135,19 @@
     let clickCount = 0;
     let maxClicks = Math.floor(Math.random() * 2) + 3;
     let isBalloonActive = false;
-    let alphabetIndex = 0; // Start with "A" (index 0)
-    const maxBalloonImages = 10; // Update this to reflect the number of balloon images you have
+    let alphabetIndex = 0; 
+    const maxBalloonImages = 10; 
 
     function createBalloon() {
       let balloon = document.createElement('div');
       balloon.classList.add('balloon');
 
-      // Image index for the balloons: Loop back after the available number of balloon images
-      let balloonImageIndex = (alphabetIndex % maxBalloonImages) + 1;  // Loop back after maxBalloonImages
+     
+      let balloonImageIndex = (alphabetIndex % maxBalloonImages) + 1;  
       balloon.style.backgroundImage = `url('Symbol 10000${balloonImageIndex}.png')`;
 
-      // Alphabet image stays sequential from A-Z
-      let letterImageIndex = alphabetIndex + 1; // Image index starts from 10001 to 10026 for alphabets
+      
+      let letterImageIndex = alphabetIndex + 1; 
       let letter = document.createElement('div');
       letter.classList.add('balloon-letter');
       letter.style.backgroundImage = `url('Symbol 1000${letterImageIndex}.png')`;
@@ -173,15 +173,16 @@
     }
 
     function generateRandomPosition() {
-      // Get screen dimensions
+      
+
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
 
-      // Generate random X and Y positions within the screen boundaries
-      const randomX = Math.random() * (screenWidth - 60); // 60 is the width of the balloon
-      const randomY = Math.random() * (screenHeight - 80); // 80 is the height of the balloon
+     
+      const randomX = Math.random() * (screenWidth - 60); 
+      const randomY = Math.random() * (screenHeight - 80); 
 
-      // Set CSS variables to use in the animation
+     
       document.documentElement.style.setProperty('--randomX', `${randomX}px`);
       document.documentElement.style.setProperty('--randomY', `${randomY}px`);
     }
@@ -207,18 +208,18 @@
         knot.style.opacity = 1;
 
         setTimeout(() => {
-          // Generate random positions for the balloon to float
+          
           generateRandomPosition();
 
-          // Trigger the balloon to float randomly within screen bounds using CSS animation
+          
           currentBalloon.style.animation = 'floatBalloon 6s ease-out forwards';
 
-          // Reset and prepare for the next balloon
+          
           clickCount = 0;
           maxClicks = Math.floor(Math.random() * 2) + 3;
 
-          // Update alphabet index
-          alphabetIndex = (alphabetIndex + 1) % 26; // Loop back to "A" after "Z"
+          
+          alphabetIndex = (alphabetIndex + 1) % 26; 
 
           isBalloonActive = false;
         }, 1000);
