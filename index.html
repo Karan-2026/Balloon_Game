@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloon Game</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    .game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('Symbol 3 copy.png');
+      background-size: cover;
+      z-index: 0;
+    }
+
+    .balloon {
+      position: absolute;
+      width: 60px;
+      height: 80px;
+      background-size: cover;
+      cursor: pointer;
+      transition: transform 6s ease-out;
+      z-index: 1;
+    }
+
+    .balloon-letter {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+
+    .knot {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 15px;
+      background-image: url('Symbol 100011.png');
+      background-size: cover;
+      opacity: 0;
+    }
+
+    .pump {
+      position: absolute;
+      right: 100px;
+      bottom: 100px;
+      width: 180px;
+      height: 200px;
+      background-image: url('Symbol 320003.png');
+      background-size: cover;
+      z-index: 2;
+    }
+
+    .pump-handle {
+      position: absolute;
+      right: 100px;
+      bottom: 240px;
+      width: 150px;
+      height: 150px;
+      background-image: url('Symbol 320001.png');
+      background-size: cover;
+      transition: transform 0.1s ease-in-out;
+    }
+
+    .balloon-end {
+      position: absolute;
+      right: 240px;
+      bottom: 160px;
+      width: 140px;
+      height: 180px;
+      background-image: url('Symbol 320002.png');
+      background-size: cover;
+    }
+
+    @keyframes balloon-burst {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    @keyframes floatBalloon {
+      0% {
+        transform: translate(0, 0);
+      }
+      100% {
+        transform: translate(var(--randomX), var(--randomY));
+      }
+    }
+
+    /* For letters disappearing */
+    .balloon-bursting .balloon-letter {
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="background"></div>
+    <div class="pump" id="pump"></div>
+    <div class="pump-handle" id="pump-handle"></div>
+    <div class="balloon-end" id="balloon-end"></div>
+  </div>
+
+  <script>
+    const pumpHandle = document.getElementById('pump-handle');
+    const balloonEnd = document.getElementById('balloon-end');
+    let currentBalloon = null;
+    let clickCount = 0;
+    let maxClicks = Math.floor(Math.random() * 2) + 3;
+    let isBalloonActive = false;
+    let alphabetIndex = 0; // Start with "A" (index 0)
+    const maxBalloonImages = 10; // Update this to reflect the number of balloon images you have
+
+    function createBalloon() {
+      let balloon = document.createElement('div');
+      balloon.classList.add('balloon');
+
+      // Image index for the balloons: Loop back after the available number of balloon images
+      let balloonImageIndex = (alphabetIndex % maxBalloonImages) + 1;  // Loop back after maxBalloonImages
+      balloon.style.backgroundImage = `url('Symbol 10000${balloonImageIndex}.png')`;
+
+      // Alphabet image stays sequential from A-Z
+      let letterImageIndex = alphabetIndex + 1; // Image index starts from 10001 to 10026 for alphabets
+      let letter = document.createElement('div');
+      letter.classList.add('balloon-letter');
+      letter.style.backgroundImage = `url('Symbol 1000${letterImageIndex}.png')`;
+      balloon.appendChild(letter);
+
+      let knot = document.createElement('div');
+      knot.classList.add('knot');
+      balloon.appendChild(knot);
+
+      document.querySelector('.game-container').appendChild(balloon);
+
+      let pumpRect = balloonEnd.getBoundingClientRect();
+      balloon.style.left = `${pumpRect.left}px`;
+      balloon.style.top = `${pumpRect.top}px`;
+
+      balloon.addEventListener('click', () => {
+        balloon.classList.add('balloon-bursting');
+        balloon.style.animation = 'balloon-burst 0.5s forwards';
+        setTimeout(() => balloon.remove(), 500);
+      });
+
+      return balloon;
+    }
+
+    function generateRandomPosition() {
+      // Get screen dimensions
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+
+      // Generate random X and Y positions within the screen boundaries
+      const randomX = Math.random() * (screenWidth - 60); // 60 is the width of the balloon
+      const randomY = Math.random() * (screenHeight - 80); // 80 is the height of the balloon
+
+      // Set CSS variables to use in the animation
+      document.documentElement.style.setProperty('--randomX', `${randomX}px`);
+      document.documentElement.style.setProperty('--randomY', `${randomY}px`);
+    }
+
+    pumpHandle.addEventListener('click', () => {
+      if (!isBalloonActive) {
+        currentBalloon = createBalloon();
+        isBalloonActive = true;
+      }
+
+      clickCount++;
+      pumpHandle.style.transform = 'translateY(10px)';
+      setTimeout(() => pumpHandle.style.transform = 'translateY(0)', 100);
+
+      if (clickCount <= maxClicks) {
+        let newSize = 60 + 20 * clickCount;
+        currentBalloon.style.width = `${newSize}px`;
+        currentBalloon.style.height = `${newSize + 20}px`;
+      }
+
+      if (clickCount === maxClicks) {
+        let knot = currentBalloon.querySelector('.knot');
+        knot.style.opacity = 1;
+
+        setTimeout(() => {
+          // Generate random positions for the balloon to float
+          generateRandomPosition();
+
+          // Trigger the balloon to float randomly within screen bounds using CSS animation
+          currentBalloon.style.animation = 'floatBalloon 6s ease-out forwards';
+
+          // Reset and prepare for the next balloon
+          clickCount = 0;
+          maxClicks = Math.floor(Math.random() * 2) + 3;
+
+          // Update alphabet index
+          alphabetIndex = (alphabetIndex + 1) % 26; // Loop back to "A" after "Z"
+
+          isBalloonActive = false;
+        }, 1000);
+      }
+    });
+  </script>
+</body>
+</html>
